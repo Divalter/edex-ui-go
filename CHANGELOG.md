@@ -25,3 +25,14 @@ to Go and Wails.
 - The terminals are no longer exposed through unauthenticated WebSocket servers on
   `127.0.0.1:3000+`, which allowed any website to run commands. The app does not listen on
   any network port; the UI uses the Wails IPC.
+- File browser: names and paths typed in the shell are shell-quoted (a folder named `$(cmd)`
+  executed `cmd` when clicked in eDEX-UI).
+- Process names, disk labels, mount points and file paths are HTML-escaped before being
+  displayed or used in inline handlers.
+- Content Security Policy in the built UI.
+- Built with Go 1.25.14 (toolchain pinned in go.mod): the Go 1.25.0 standard library had known
+  vulnerabilities (crypto/tls, net/http, crypto/x509…).
+- nanoid 3.3.19 and smoothie 1.36.1 (GHSA-28wg-ghj8-5hjv, GHSA-g662-qq45-ppwm).
+
+### Fixed
+- The UI hung at startup with `nointro` on WebKit (fonts wait).

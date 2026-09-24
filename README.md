@@ -126,6 +126,16 @@ access all go through the Wails IPC, which is only reachable from the applicatio
 The optional development server (`edex-serve`) binds to loopback only, requires a random
 192-bit token on every request and rejects requests coming from other origins.
 
+Other issues inherited from eDEX-UI are fixed as well:
+
+- **Shell injection from file names.** Clicking a folder typed `cd "<name>"` in the shell, so a
+  folder named `$(command)` (from a cloned repository, an archive…) ran `command`. Paths are now
+  quoted for the shell (POSIX or PowerShell).
+- **HTML injection.** Process names and users (of any local user), disk labels, mount points and
+  file paths were inserted as HTML or inside inline handlers. Since the UI drives the shell, an
+  injection amounts to code execution; these values are now escaped.
+- **Content Security Policy.** The UI cannot load or send anything to another origin.
+
 Please report vulnerabilities privately through GitHub security advisories.
 
 ## Credits

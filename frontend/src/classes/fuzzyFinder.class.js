@@ -7,6 +7,7 @@
  *
  * Modified for eDEX-UI-GO on 2026-09-24:
  *  - Converted from a CommonJS script to an ES module.
+ *  - Security: the selected path is shell-quoted before being typed.
  */
 class FuzzyFinder {
     constructor() {
@@ -135,7 +136,7 @@ class FuzzyFinder {
         
         let filePath = path.resolve(window.fsDisp.dirpath, file);
         
-          window.term[window.currentTerm].write(`'${filePath}'`);
+          window.term[window.currentTerm].write(window._shellQuote(filePath));
           this.disp.close();
      }
 }

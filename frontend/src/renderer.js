@@ -13,6 +13,9 @@
  *  - Branding: eDEX-UI-GO, with credits to the original project.
  *  - New KB_TOGGLE shortcut and hideKeyboard setting to hide the on-screen
  *    keyboard.
+ *  - waitForFonts() relies on document.fonts.ready.
+ *  - Security: shell quoting helper for the file browser, process and user
+ *    names are HTML-escaped.
  */
 // Disable eval()
 window.eval = function () {
@@ -39,6 +42,16 @@ window._purifyCSS = str => {
         str = str.toString();
     }
     return str.replace(/[<]/g, "");
+};
+// Quotes a string for the configured shell, so that paths typed by the file
+// browser cannot run commands (eDEX-UI-GO security fix).
+window._shellQuote = str => {
+    str = String(str);
+    if (window.process && window.process.platform === "win32") {
+        if (/(^|[\\/])cmd(\.exe)?$/i.test(window.settings.shell || "")) return '"' + str.replace(/"/g, '""') + '"';
+        return "'" + str.replace(/'/g, "''") + "'"; // PowerShell
+    }
+    return "'" + str.replace(/'/g, "'\\''") + "'";
 };
 window._delay = ms => {
     return new Promise((resolve, reject) => {
@@ -180,21 +193,15 @@ function initGraphicalErrorHandling() {
 }
 
 function waitForFonts() {
+    // The original waited for a "readystatechange" event, which never comes
+    // when this module runs after the page finished loading (it hung with
+    // nointro on WebKit). document.fonts.ready covers both cases.
     return new Promise(resolve => {
-        if (document.readyState !== "complete" || document.fonts.status !== "loaded") {
-            document.addEventListener("readystatechange", () => {
-                if (document.readyState === "complete") {
-                    if (document.fonts.status === "loaded") {
-                        resolve();
-                    } else {
-                        document.fonts.onloadingdone = () => {
-                            if (document.fonts.status === "loaded") resolve();
-                        };
-                    }
-                }
-            });
+        let fontsReady = () => document.fonts.ready.then(() => resolve());
+        if (document.readyState === "complete") {
+            fontsReady();
         } else {
-            resolve();
+            window.addEventListener("load", fontsReady, {once: true});
         }
     });
 }
@@ -405,7 +412,7 @@ async function initUI() {
 
     getDisplayName().then(user => {
         if (user) {
-            greeter.innerHTML += `Welcome back, <em>${user}</em>`;
+            greeter.innerHTML += `Welcome back, <em>${window._escapeHtml(user)}</em>`;
         } else {
             greeter.innerHTML += "Welcome back";
         }
@@ -500,7 +507,7 @@ async function initUI() {
     };
     window.currentTerm = 0;
     window.term[0].onprocesschange = p => {
-        document.getElementById("shell_tab0").innerHTML = `<p>MAIN - ${p}</p>`;
+        document.getElementById("shell_tab0").innerHTML = `<p>MAIN - ${window._escapeHtml(p)}</p>`;
     };
     // Prevent losing hardware keyboard focus on the terminal when using touch keyboard
     window.onmouseup = e => {
@@ -607,7 +614,7 @@ window.focusShellTab = number => {
                 };
 
                 window.term[number].onprocesschange = p => {
-                    document.getElementById("shell_tab"+number).innerHTML = `<p>#${number+1} - ${p}</p>`;
+                    document.getElementById("shell_tab"+number).innerHTML = `<p>#${number+1} - ${window._escapeHtml(p)}</p>`;
                 };
 
                 document.getElementById("shell_tab"+number).innerHTML = `<p>::${port}</p>`;
