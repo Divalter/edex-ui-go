@@ -78,7 +78,7 @@ sudo apt install build-essential pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev
 Then:
 
 ```bash
-git clone https://github.com/dcasula/edex-ui-go.git
+git clone https://github.com/Divalter/edex-ui-go.git
 cd edex-ui-go
 make deps
 make build        # binary in build/bin/

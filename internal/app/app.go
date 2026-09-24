@@ -34,7 +34,7 @@ import (
 const Name = "eDEX-UI-GO"
 
 // UpdateRepo is the GitHub repository checked for new releases.
-const UpdateRepo = "dcasula/edex-ui-go"
+const UpdateRepo = "Divalter/edex-ui-go"
 
 // Options configures the backend.
 type Options struct {
