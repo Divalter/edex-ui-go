@@ -53,8 +53,15 @@ Everything the original had:
 - On-screen keyboard with 19 layouts, touch support and password mode
 - Themes (21 bundled), settings editor, keyboard shortcuts editor, sound effects
 
-Plus: a shortcut (**Ctrl+Shift+Alt+K**) and a `hideKeyboard` setting to hide the on-screen keyboard
-and give its space to the file browser.
+Plus:
+
+- **Drop-down mode**: press **F12** from anywhere to hide eDEX-UI-GO and bring it back on top,
+  like Guake or Quake's console. The key is set by `dropdownHotkey` in `settings.json`
+  (`"Ctrl+Alt+T"`, ``"Super+`"``…, empty to disable). It works out of the box on X11 and Windows;
+  on Wayland and macOS, where applications cannot grab keys globally, bind `edex-ui-go --toggle`
+  to a shortcut in your desktop settings.
+- A shortcut (**Ctrl+Shift+Alt+K**) and a `hideKeyboard` setting to hide the on-screen keyboard
+  and give its space to the file browser.
 
 ## Installing
 
@@ -88,6 +95,7 @@ make build        # binary in build/bin/
 
 ```bash
 ./build/bin/edex-ui-go             # or edex-ui-go --nointro / --nocursor
+./build/bin/edex-ui-go --toggle    # show/hide the running instance (drop-down mode)
 ```
 
 The configuration lives in the user data directory, like the original:

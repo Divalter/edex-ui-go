@@ -319,9 +319,10 @@ type Release struct {
 	HTMLURL string `json:"html_url"`
 }
 
-// LatestRelease queries GitHub for the latest published release.
+// LatestRelease queries GitHub for the most recent release, pre-releases
+// included (the /releases/latest endpoint ignores them).
 func LatestRelease() (*Release, error) {
-	req, err := http.NewRequest(http.MethodGet, "https://api.github.com/repos/"+UpdateRepo+"/releases/latest", nil)
+	req, err := http.NewRequest(http.MethodGet, "https://api.github.com/repos/"+UpdateRepo+"/releases?per_page=1", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -336,9 +337,12 @@ func LatestRelease() (*Release, error) {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
 		return nil, fmt.Errorf("GitHub API returned %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
 	}
-	var rel Release
-	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
+	var releases []Release
+	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
 		return nil, err
 	}
-	return &rel, nil
+	if len(releases) == 0 {
+		return nil, errors.New("no release published yet")
+	}
+	return &releases[0], nil
 }

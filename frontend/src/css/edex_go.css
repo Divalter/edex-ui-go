@@ -47,3 +47,12 @@ div#main_shell_innercontainer {
     position: relative;
     z-index: 1;
 }
+
+/* Drop-down mode: slide down from the top when the hotkey shows the window */
+@keyframes edex_dropdown {
+    from { transform: translateY(-100vh); }
+    to   { transform: none; }
+}
+html.dropdown_show body {
+    animation: edex_dropdown 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}

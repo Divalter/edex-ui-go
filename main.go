@@ -33,6 +33,9 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
+// instanceID identifies the running instance for the single instance lock.
+const instanceID = "c1f3a7e2-edex-ui-go"
+
 // Host is bound to the UI as window.go.main.Host.
 type Host struct {
 	ctx      atomic.Pointer[context.Context]
@@ -41,6 +44,7 @@ type Host struct {
 
 	fullscreen     bool
 	fullscreenOnce sync.Once
+	drop           dropdown
 }
 
 // Call runs a backend RPC method (see internal/app/handlers.go).
@@ -88,7 +92,9 @@ func (h *Host) startup(ctx context.Context) {
 			Message: h.startErr.Error(),
 		})
 		runtime.Quit(ctx)
+		return
 	}
+	h.startDropdown()
 }
 
 // domReady enters fullscreen once the window is mapped. The start state
@@ -111,6 +117,7 @@ func (h *Host) domReady(ctx context.Context) {
 }
 
 func (h *Host) shutdown(context.Context) {
+	h.stopDropdown()
 	if h.backend != nil {
 		h.backend.Shutdown()
 	}
@@ -143,6 +150,9 @@ func main() {
 	host := &Host{}
 	if generatingBindings {
 		_ = wails.Run(&options.App{Bind: []interface{}{host}})
+		return
+	}
+	if forwardToRunningInstance(instanceID) {
 		return
 	}
 	host.backend, host.startErr = app.New(app.Options{
@@ -192,12 +202,9 @@ func main() {
 		OnShutdown: host.shutdown,
 		Bind:       []interface{}{host},
 		SingleInstanceLock: &options.SingleInstanceLock{
-			UniqueId: "c1f3a7e2-edex-ui-go",
-			OnSecondInstanceLaunch: func(options.SecondInstanceData) {
-				log.Printf("Another instance of %s is already running.", app.Name)
-				if ctx := host.context(); ctx != nil {
-					runtime.WindowShow(ctx)
-				}
+			UniqueId: instanceID,
+			OnSecondInstanceLaunch: func(data options.SecondInstanceData) {
+				host.secondInstance(data.Args)
 			},
 		},
 		Linux: &linux.Options{

@@ -12,7 +12,7 @@
  *    theme, keyboard layout and boot log are read asynchronously.
  *  - Branding: eDEX-UI-GO, with credits to the original project.
  *  - New KB_TOGGLE shortcut and hideKeyboard setting to hide the on-screen
- *    keyboard.
+ *    keyboard; dropdownHotkey setting (drop-down mode, see host/dropdown.js).
  *  - waitForFonts() relies on document.fonts.ready.
  *  - Security: shell quoting helper for the file browser, process and user
  *    names are HTML-escaped.
@@ -757,6 +757,11 @@ window.openSettings = async () => {
                         </select></td>
                     </tr>
                     <tr>
+                        <td>dropdownHotkey</td>
+                        <td>Global shortcut showing/hiding eDEX (drop-down mode, empty to disable, restart required)</td>
+                        <td><input type="text" id="settingsEditor-dropdownHotkey" value="${window._escapeHtml((typeof window.settings.dropdownHotkey === "string") ? window.settings.dropdownHotkey : "F12")}"></td>
+                    </tr>
+                    <tr>
                         <td>hideKeyboard</td>
                         <td>Hide the on-screen keyboard (toggle with Ctrl+Shift+Alt+K)</td>
                         <td><select id="settingsEditor-hideKeyboard">
@@ -888,6 +893,7 @@ window.writeSettingsFile = () => {
         nointro: (document.getElementById("settingsEditor-nointro").value === "true"),
         nocursor: (document.getElementById("settingsEditor-nocursor").value === "true"),
         hideKeyboard: (document.getElementById("settingsEditor-hideKeyboard").value === "true"),
+        dropdownHotkey: document.getElementById("settingsEditor-dropdownHotkey").value.trim(),
         iface: document.getElementById("settingsEditor-iface").value,
         allowWindowed: (document.getElementById("settingsEditor-allowWindowed").value === "true"),
         forceFullscreen: window.settings.forceFullscreen,

@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Drop-down mode: a global hotkey (`dropdownHotkey`, F12 by default) hides the window and brings
+  it back on top, sliding down. Implemented for X11 (pure Go, focus granted through
+  `_NET_ACTIVE_WINDOW`) and Windows (`RegisterHotKey`). `edex-ui-go --toggle` does the same from
+  the command line, for Wayland and macOS desktop shortcuts.
+
+### Fixed
+- A second launch (`edex-ui-go --toggle`, or starting it again) no longer starts a shell and
+  touches the configuration before handing over to the running instance.
+- The update checker ignored pre-releases.
+
 ## [0.0.1] - 2026-09-24
 
 First port of [eDEX-UI](https://github.com/GitSquared/edex-ui) 2.2.8 by Gabriel "Squared" SAILLARD

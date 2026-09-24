@@ -81,6 +81,7 @@ type defaultSettings struct {
 	HideDotfiles              bool    `json:"hideDotfiles"`
 	FsListView                bool    `json:"fsListView"`
 	HideKeyboard              bool    `json:"hideKeyboard"`
+	DropdownHotkey            string  `json:"dropdownHotkey"`
 	ExperimentalGlobeFeatures bool    `json:"experimentalGlobeFeatures"`
 	ExperimentalFeatures      bool    `json:"experimentalFeatures"`
 }
@@ -103,6 +104,7 @@ func newDefaultSettings(cwd string) defaultSettings {
 		Port:                      3000,
 		ForceFullscreen:           true,
 		ExcludeThreadsFromToplist: true,
+		DropdownHotkey:            "F12",
 	}
 }
 
