@@ -1,0 +1,22 @@
+{
+	"fontMain": "Rajdhani",
+	"fontMainLight": "Rajdhani-Light",
+	"terminal": {
+		"fontFamily": "Fira Code",
+		"cursorBlink": true
+	},
+	"colors": {
+		"r": 255,
+		"g": 165,
+		"b": 0,
+		"black": "#0a0a0a",
+		"white": "#ffffff",
+		"red": "#ff4500",
+		"green": "#32cd32",
+		"blue": "#1e90ff",
+		"cyan": "#00ced1",
+		"magenta": "#ff1493",
+		"yellow": "#ffd700"
+	},
+	"injectCSS": ""
+}
