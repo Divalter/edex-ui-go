@@ -63,6 +63,21 @@ Plus:
 - A shortcut (**Ctrl+Shift+Alt+K**) and a `hideKeyboard` setting to hide the on-screen keyboard
   and give its space to the file browser.
 
+## Performance
+
+Compared with eDEX-UI 2.2.8 on the same machine (median of 3 runs, see
+[docs/PERFORMANCE.md](docs/PERFORMANCE.md)):
+
+| | eDEX-UI (Electron) | eDEX-UI-GO |
+|---|---|---|
+| Memory (all processes) | 524 MB | **380 MB** |
+| Startup until the terminal is ready | 4.3 s | **4.0 s** |
+| Idle CPU | 50% of a core | 50% of a core |
+| Download / installed | 97 MB / 236 MB | **10 MB / 23 MB** |
+
+Idle CPU is the same because it is spent by the UI itself (animated globe and graphs), which is
+the same code in both.
+
 ## Installing
 
 Pre-built binaries will be published on the Releases page.

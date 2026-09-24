@@ -1,6 +1,7 @@
 package terminal
 
 import (
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -49,6 +50,7 @@ func (t *TTY) ServeWS(w http.ResponseWriter, r *http.Request) {
 	}
 	sink := &wsSink{conn: conn}
 	t.Attach(sink)
+	log.Printf("Terminal %d connected to frontend", t.Port)
 	for {
 		_, msg, err := conn.ReadMessage()
 		if err != nil || t.Write(msg) != nil {

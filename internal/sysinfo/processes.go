@@ -41,6 +41,9 @@ type Processes struct {
 	List     []Process `json:"list"`
 }
 
+// useProcfs selects the fast Linux scanner (see procfs_linux.go).
+var useProcfs = runtime.GOOS == "linux"
+
 type procSample struct {
 	cpuSeconds float64
 }
@@ -54,13 +57,16 @@ func (s *SI) Processes() (*Processes, error) {
 		return s.procCache, nil
 	}
 
-	procs, err := process.Processes()
-	if err != nil {
-		return nil, err
-	}
 	var totalMem uint64
 	if vm, err := mem.VirtualMemory(); err == nil {
 		totalMem = vm.Total
+	}
+	if useProcfs {
+		return s.scanProcfs(totalMem)
+	}
+	procs, err := process.Processes()
+	if err != nil {
+		return nil, err
 	}
 
 	now := time.Now()
@@ -161,7 +167,12 @@ func (s *SI) username(p *process.Process) string {
 	if err != nil || len(uids) == 0 {
 		return ""
 	}
-	uid := strconv.Itoa(int(uids[0]))
+	return s.uidName(uids[0])
+}
+
+// uidName resolves a user id, caching the lookups.
+func (s *SI) uidName(id uint32) string {
+	uid := strconv.FormatUint(uint64(id), 10)
 	if name, ok := s.userCache[uid]; ok {
 		return name
 	}

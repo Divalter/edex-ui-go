@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Linux: the process list reads `/proc/<pid>/stat` directly instead of using gopsutil, 15 times
+  faster (5.9 ms instead of 90 ms for ~500 processes) with 29 times fewer allocations.
+- The backend logs when a terminal connects to the UI, like the original.
+
+### Added
+- `docs/PERFORMANCE.md` and `scripts/perf/measure.py`: startup, memory and CPU compared with
+  eDEX-UI 2.2.8.
+
 ## [0.0.2] - 2026-09-24
 
 ### Added

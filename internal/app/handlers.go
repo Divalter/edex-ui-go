@@ -55,6 +55,7 @@ func (a *App) registerHandlers() {
 		a.sinks[t.Port] = sink
 		a.sinksMu.Unlock()
 		t.Attach(sink)
+		log.Printf("Terminal %d connected to frontend", t.Port)
 		return nil, nil
 	})
 	b.Handle("tty.write", func(args []json.RawMessage) (any, error) {
