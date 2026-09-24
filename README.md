@@ -4,6 +4,9 @@
 
 <h1 align="center">eDEX-UI-GO</h1>
 
+> **Branch `rework-2026`:** native rewrite of the interface with Gio, in progress. See
+> [ROADMAP.md](ROADMAP.md). The faithful port is on [`main`](https://github.com/Divalter/edex-ui-go/tree/main).
+
 > **eDEX-UI-GO is a port of [eDEX-UI](https://github.com/GitSquared/edex-ui), created by
 > [Gabriel "Squared" SAILLARD](https://github.com/GitSquared).**
 > The interface, the themes, the keyboard layouts, the sounds, the fonts and most of the UI
