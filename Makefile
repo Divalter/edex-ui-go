@@ -1,7 +1,7 @@
 .PHONY: all deps frontend dev build serve test lint clean
 
 WAILS ?= $(shell which wails 2>/dev/null || echo $(HOME)/go/bin/wails)
-VERSION ?= 0.0.1
+VERSION ?= 0.0.2
 LDFLAGS := -s -w -X edex-ui-go/internal/buildinfo.Version=$(VERSION)
 
 # Linux distributions ship WebKitGTK 4.1 (libwebkit2gtk-4.1-dev)

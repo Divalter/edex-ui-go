@@ -8,7 +8,7 @@ import (
 
 // Version is the eDEX-UI-GO version, set at build time with
 // -ldflags "-X edex-ui-go/internal/buildinfo.Version=x.y.z".
-var Version = "0.0.1"
+var Version = "0.0.2"
 
 // Runtime describes the Go and Wails versions, e.g. "Wails v2.16.0 / Go 1.25.0".
 func Runtime(withWails bool) string {
