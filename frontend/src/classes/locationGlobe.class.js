@@ -8,7 +8,11 @@
  * Modified for eDEX-UI-GO on 2026-09-24:
  *  - The GeoIP lookup of connections is asynchronous (see netstat.class.js).
  *  - Converted from a CommonJS script to an ES module.
+ *  - The animation loop goes through the frame clock (host/frameclock.js),
+ *    with the original timing unless eco mode is on or the window is covered.
  */
+import {requestFrame} from "../host/frameclock.js";
+
 class LocationGlobe {
     constructor(parentId) {
         if (!parentId) throw "Missing parameters";
@@ -66,14 +70,12 @@ class LocationGlobe {
                     window.mods.globe.globe.tick();
                 }
                 if (window.mods.globe._animate) {
-                    setTimeout(() => {
-                        try {
-                            requestAnimationFrame(window.mods.globe._animate);
-                        } catch(e) {
-                            // We probably got caught in a theme change. Print it out but everything should keep running fine.
-                            console.warn(e);
-                        }
-                    }, 1000 / 30);
+                    try {
+                        requestFrame(window.mods.globe._animate, 1000 / 30);
+                    } catch(e) {
+                        // We probably got caught in a theme change. Print it out but everything should keep running fine.
+                        console.warn(e);
+                    }
                 }
             };
             this.globe.init(window.theme.colors.light_black, () => {

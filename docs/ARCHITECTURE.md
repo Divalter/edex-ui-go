@@ -22,6 +22,7 @@ unchanged, on top of small replacements for the Node/Electron APIs it used.
 │ internal/netinfo       external IP, TCP ping, GeoLite2                   │
 │ internal/config        user data dir, default files, asset mirroring     │
 │ internal/bridge        RPC registry; HTTP server for edex-serve only     │
+│ internal/occlusion     X11: window covered? (pauses the animations)      │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 

@@ -19,6 +19,8 @@ import color from "color";
 import {nanoid} from "nanoid";
 import prettyBytes from "pretty-bytes";
 
+import {paceSmoothie} from "./frameclock.js";
+
 import fileIcons from "../assets/file-icons.json";
 import fileIconsMatch from "../assets/file-icons-match.js";
 import grid from "../assets/grid.json";
@@ -26,6 +28,7 @@ import grid from "../assets/grid.json";
 // CommonJS packages: use the named exports when the bundler provides them.
 const smoothie = smoothieNs.SmoothieChart ? smoothieNs : smoothieNs.default;
 const howler = howlerNs.Howl ? howlerNs : howlerNs.default;
+paceSmoothie(smoothie);
 
 export function createNodeShims(boot) {
     const path = makePath(boot.platform === "win32");

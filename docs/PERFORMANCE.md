@@ -35,6 +35,39 @@ Runs: startup 4.00 / 4.00 / 3.98 s vs 4.18 / 4.37 / 4.31 s; CPU 50.8 / 49.6 / 46
 - **Memory** is lower because there is one WebKit web process instead of Chromium's browser,
   GPU, zygote, utility and renderer processes plus a Node.js main process.
 
+## Where the idle CPU goes
+
+Measured per thread and by switching parts of the UI off (2026-09-24):
+
+- The JavaScript is cheap: a CPU profile of the UI shows about 5% of a core, mostly the globe.
+- The cost is the rendering pipeline of the webview. WebKitGTK composites the whole page for
+  every frame in which anything changed, whatever its size, and GTK 3 redraws the whole window
+  on the CPU. The globe (~30 fps) and the four graphs (30 and 40 fps) run on their own clocks,
+  so something changes on almost every vsync.
+- The same UI in a GTK 4 + WebKitGTK 6 test host costs 10 to 15 points less: GTK 4 composites
+  the window on the GPU (about 7% of a core instead of 17 to 23%). The web process itself costs
+  the same with both.
+
+## Eco mode and covered windows
+
+Same machine, busier than for the table above (so higher absolute numbers), CPU of the whole
+process tree in percent of one core, 20 s samples after a 35 s warm-up:
+
+| | normal | eco mode | covered window |
+|---|---|---|---|
+| Runs | 69.6 / 62.2 (then 67.1) | 29.3 / 29.1 | 12.0 |
+| | | **−55%** | **−82%** |
+
+- **Eco mode** (`ecoMode`) draws the globe and the graphs together at 10 fps through one frame
+  clock (`frontend/src/host/frameclock.js`). Aligned frames matter: three loops at 10 fps out
+  of phase would still make up to 30 frames per second. Off by default, since it changes the
+  look of the animations; with it off, every animation keeps its original timing.
+- **Covered windows** (fully below other windows, minimized or on another workspace) pause those
+  animations. On X11 with a compositing window manager every window is drawn off screen, so
+  WebKitGTK never knows it is covered; the backend checks the window stack twice per second
+  (`internal/occlusion`) and tells the UI. WebView2, WKWebView and Wayland compositors already
+  stop drawing covered windows. The panels still update once or twice per second.
+
 ## Backend optimizations
 
 The process list (Top processes panel, task counter, process list window) is refreshed every one

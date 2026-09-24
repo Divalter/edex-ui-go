@@ -45,6 +45,8 @@ type Host struct {
 	fullscreen     bool
 	fullscreenOnce sync.Once
 	drop           dropdown
+	covered        atomic.Bool
+	stopOcclusion  func()
 }
 
 // Call runs a backend RPC method (see internal/app/handlers.go).
@@ -95,6 +97,7 @@ func (h *Host) startup(ctx context.Context) {
 		return
 	}
 	h.startDropdown()
+	h.startOcclusion()
 }
 
 // domReady enters fullscreen once the window is mapped. The start state
@@ -118,6 +121,9 @@ func (h *Host) domReady(ctx context.Context) {
 
 func (h *Host) shutdown(context.Context) {
 	h.stopDropdown()
+	if h.stopOcclusion != nil {
+		h.stopOcclusion()
+	}
 	if h.backend != nil {
 		h.backend.Shutdown()
 	}

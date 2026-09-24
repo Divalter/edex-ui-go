@@ -82,6 +82,7 @@ type defaultSettings struct {
 	FsListView                bool    `json:"fsListView"`
 	HideKeyboard              bool    `json:"hideKeyboard"`
 	DropdownHotkey            string  `json:"dropdownHotkey"`
+	EcoMode                   bool    `json:"ecoMode"`
 	ExperimentalGlobeFeatures bool    `json:"experimentalGlobeFeatures"`
 	ExperimentalFeatures      bool    `json:"experimentalFeatures"`
 }

@@ -26,6 +26,13 @@ feels like a sci-fi computer interface, heavily inspired by the
 It runs your shell in a real pseudo-terminal and surrounds it with live system information,
 a file browser that follows your working directory, a network globe and an on-screen keyboard.
 
+## Branches
+
+- **`main`** is the faithful port described here: the original eDEX-UI, same look and same UI
+  code, on Go and Wails.
+- **`rework-2026`** is where a native rewrite of the interface (Go + [Gio](https://gioui.org),
+  GPU-rendered, no webview) is being explored. See its `ROADMAP.md`.
+
 ## Goals
 
 - **Fidelity.** Same look, same boot sequence, same modules, same sounds, same shortcuts and the
@@ -62,6 +69,10 @@ Plus:
   to a shortcut in your desktop settings.
 - A shortcut (**Ctrl+Shift+Alt+K**) and a `hideKeyboard` setting to hide the on-screen keyboard
   and give its space to the file browser.
+- **Eco mode** (`ecoMode` setting, off by default): the globe and the graphs animate at 10 fps,
+  all on the same frames, for about half the CPU. The default look is untouched.
+- The animations **pause while the window is covered** by other windows (on X11, where the
+  webview cannot tell by itself; the other platforms already do it).
 
 ## Performance
 
@@ -76,7 +87,8 @@ Compared with eDEX-UI 2.2.8 on the same machine (median of 3 runs, see
 | Download / installed | 97 MB / 236 MB | **10 MB / 23 MB** |
 
 Idle CPU is the same because it is spent by the UI itself (animated globe and graphs), which is
-the same code in both.
+the same code in both. **Eco mode** brings it to about 45% of the original, and a covered window uses almost
+nothing (see [docs/PERFORMANCE.md](docs/PERFORMANCE.md#eco-mode-and-covered-windows)).
 
 ## Installing
 

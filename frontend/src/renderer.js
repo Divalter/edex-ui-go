@@ -16,7 +16,10 @@
  *  - waitForFonts() relies on document.fonts.ready.
  *  - Security: shell quoting helper for the file browser, process and user
  *    names are HTML-escaped.
+ *  - ecoMode setting (see host/frameclock.js).
  */
+import {ECO_FPS, setEco} from "./host/frameclock.js";
+
 // Disable eval()
 window.eval = function () {
     throw new Error("eval() is disabled for security reasons.");
@@ -85,6 +88,7 @@ Object.assign(window, {path, fs, electron, remote, ipc, settingsDir, themesDir, 
 
 // Load config
 window.settings = boot.settings;
+setEco(window.settings.ecoMode === true);
 window.shortcuts = boot.shortcuts;
 window.lastWindowState = boot.lastWindowState;
 
@@ -770,6 +774,14 @@ window.openSettings = async () => {
                         </select></td>
                     </tr>
                     <tr>
+                        <td>ecoMode</td>
+                        <td>Eco mode: the globe and the graphs animate at ${ECO_FPS} fps, all together, to use less CPU</td>
+                        <td><select id="settingsEditor-ecoMode">
+                            <option>${window.settings.ecoMode === true}</option>
+                            <option>${!(window.settings.ecoMode === true)}</option>
+                        </select></td>
+                    </tr>
+                    <tr>
                         <td>nointro</td>
                         <td>Skip the intro boot log and logo${(window.settings.nointroOverride) ? " (Currently overridden by CLI flag)" : ""}</td>
                         <td><select id="settingsEditor-nointro">
@@ -893,6 +905,7 @@ window.writeSettingsFile = () => {
         nointro: (document.getElementById("settingsEditor-nointro").value === "true"),
         nocursor: (document.getElementById("settingsEditor-nocursor").value === "true"),
         hideKeyboard: (document.getElementById("settingsEditor-hideKeyboard").value === "true"),
+        ecoMode: (document.getElementById("settingsEditor-ecoMode").value === "true"),
         dropdownHotkey: document.getElementById("settingsEditor-dropdownHotkey").value.trim(),
         iface: document.getElementById("settingsEditor-iface").value,
         allowWindowed: (document.getElementById("settingsEditor-allowWindowed").value === "true"),

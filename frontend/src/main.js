@@ -38,6 +38,7 @@ import "./css/edex_go.css";
 import {call, connect, fileURL, ipcRenderer, isWails, openTTY} from "./host/bridge.js";
 import {createNodeShims} from "./host/node.js";
 import {initDropdown} from "./host/dropdown.js";
+import {setPaused} from "./host/frameclock.js";
 import {initSelects} from "./host/select.js";
 
 import {Modal} from "./classes/modal.class.js";
@@ -82,6 +83,11 @@ async function start() {
     initSelects();
     await import("./renderer.js");
     initDropdown();
+    if (isWails) {
+        // The backend reports when the window is entirely covered (X11).
+        ipcRenderer.on("window", (e, state) => setPaused(state === "covered"));
+        call("window.covered").then(setPaused).catch(() => {});
+    }
 }
 
 start().catch(e => {

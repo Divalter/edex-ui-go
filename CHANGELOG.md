@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Eco mode (`ecoMode` setting, off by default): the globe and the CPU and network graphs animate
+  at 10 fps on the same frames. Idle CPU drops by about 55% (see docs/PERFORMANCE.md).
+- The animations pause while the window is entirely covered by other windows, minimized or on
+  another workspace (X11; WebView2, WKWebView and Wayland compositors already stop drawing
+  covered windows). Idle CPU drops by about 80% meanwhile.
+
 ### Changed
 - Linux: the process list reads `/proc/<pid>/stat` directly instead of using gopsutil, 15 times
   faster (5.9 ms instead of 90 ms for ~500 processes) with 29 times fewer allocations.
