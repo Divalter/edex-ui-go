@@ -1,6 +1,6 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "edex-ui-go",
+  "name": "eDEX-UI-GO",
   "outputfilename": "edex-ui-go",
   "frontend:install": "npm install",
   "frontend:build": "npm run build",
@@ -9,5 +9,11 @@
   "author": {
     "name": "Divalter",
     "email": "divalter@gmail.com"
+  },
+  "info": {
+    "productName": "eDEX-UI-GO",
+    "productVersion": "0.1.0",
+    "copyright": "Copyright © 2017-2021 Gabriel 'Squared' SAILLARD (eDEX-UI), 2026 eDEX-UI-GO contributors. GPLv3.",
+    "comments": "A science fiction terminal emulator. Go + Wails port of eDEX-UI by Gabriel 'Squared' SAILLARD."
   }
 }

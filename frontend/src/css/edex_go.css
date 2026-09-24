@@ -1,0 +1,49 @@
+/*
+ * Additions of eDEX-UI-GO on top of the original eDEX-UI stylesheets,
+ * which are kept unmodified in this folder.
+ */
+
+/* On-screen keyboard toggle (KB_TOGGLE shortcut / hideKeyboard setting) */
+html.keyboard_hidden section#keyboard {
+    display: none;
+}
+html.keyboard_hidden section#filesystem,
+html.keyboard_hidden section#filesystem > h3.title {
+    width: 99vw;
+}
+html.keyboard_hidden div#fs_disp_container {
+    width: 98.5vw;
+}
+html.keyboard_hidden div#fs_space_bar > h3 {
+    width: 15%;
+}
+html.keyboard_hidden div#fs_space_bar > progress {
+    width: 85%;
+}
+
+/* xterm.js 6 draws its own scrollbar; keep it hidden like the original */
+.xterm .xterm-scrollable-element > .scrollbar {
+    display: none !important;
+}
+
+/*
+ * The "TERMINAL / MAIN SHELL" title is a position:fixed child of the main
+ * shell. Current browser engines clip fixed descendants with the element
+ * clip-path set by augmented-ui (Electron 12 did not), which hid the title.
+ * The cut corners are still drawn by the ::after border.
+ */
+section#main_shell[augmented-ui~="exe"] {
+    clip-path: none;
+}
+
+/*
+ * augmented-ui draws the main shell border with an ::after element covering
+ * the whole shell, clipped to a ring. When the terminal uses the WebGL
+ * renderer, current engines composite that overlay without its hole and
+ * tint the whole terminal. Keeping the terminal above the overlay avoids it;
+ * the border ring does not overlap the terminal anyway.
+ */
+div#main_shell_innercontainer {
+    position: relative;
+    z-index: 1;
+}

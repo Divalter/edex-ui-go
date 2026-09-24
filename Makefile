@@ -1,35 +1,42 @@
-.PHONY: all dev build clean test lint frontend-install frontend-build
+.PHONY: all deps frontend dev build serve test lint clean
 
 WAILS ?= $(shell which wails 2>/dev/null || echo $(HOME)/go/bin/wails)
+VERSION ?= 0.1.0
+LDFLAGS := -s -w -X edex-ui-go/internal/buildinfo.Version=$(VERSION)
+
+# Linux distributions ship WebKitGTK 4.1 (libwebkit2gtk-4.1-dev)
+ifeq ($(shell uname -s),Linux)
+TAGS := -tags webkit2_41
+endif
 
 all: build
 
-# Inicia o servidor em modo de desenvolvimento com hot-reloading
-dev:
-	$(WAILS) dev
-
-# Compila o binário de produção
-build: frontend-build
-	$(WAILS) build -clean -ldflags "-s -w"
-
-# Instala dependências do frontend
-frontend-install:
+# Installs the frontend dependencies
+deps:
 	cd frontend && npm install
 
-# Constrói os assets estáticos do frontend (Svelte 5)
-frontend-build:
+# Builds the frontend (Vite)
+frontend:
 	cd frontend && npm run build
 
-# Executa testes unitários
+# Desktop app with live reload
+dev:
+	$(WAILS) dev $(TAGS)
+
+# Production binary in build/bin
+build:
+	$(WAILS) build -clean $(TAGS) -ldflags "$(LDFLAGS)"
+
+# Backend + UI in a regular browser, without Wails (development / testing)
+serve: frontend
+	go run ./cmd/edex-serve -dist frontend/dist
+
 test:
-	go test -v -race ./...
+	go test -race ./internal/...
 
-# Verifica código Go com vet
 lint:
-	go vet ./...
-	cd frontend && npm run check
+	gofmt -l internal cmd main.go
+	go vet ./internal/... ./cmd/...
 
-# Limpa binários e diretórios de build
 clean:
-	rm -rf build/bin/
-	rm -rf frontend/dist/
+	rm -rf build/bin frontend/dist

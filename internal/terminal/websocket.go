@@ -1,118 +1,61 @@
 package terminal
 
 import (
-	"crypto/rand"
-	"encoding/hex"
-	"io"
-	"log"
-	"net"
 	"net/http"
-	"strings"
+	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-type WSInfo struct {
-	Port  int    `json:"port"`
-	Token string `json:"token"`
-}
-
-type WebSocketServer struct {
-	manager *Manager
-	Token   string
-	Port    int
-}
-
 var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+	ReadBufferSize:  32 * 1024,
+	WriteBufferSize: 32 * 1024,
+	// Only used by the development server, which checks its token before
+	// upgrading.
+	CheckOrigin: func(*http.Request) bool { return true },
 }
 
-func NewWebSocketServer(manager *Manager) (*WebSocketServer, error) {
-	bytes := make([]byte, 16)
-	if _, err := rand.Read(bytes); err != nil {
-		return nil, err
-	}
-	token := hex.EncodeToString(bytes)
-
-	return &WebSocketServer{
-		manager: manager,
-		Token:   token,
-	}, nil
+type wsSink struct {
+	mu   sync.Mutex
+	conn *websocket.Conn
 }
 
-func (s *WebSocketServer) Start() error {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/ws/", s.handleWS)
-
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		return err
-	}
-
-	s.Port = listener.Addr().(*net.TCPAddr).Port
-
-	go func() {
-		if err := http.Serve(listener, mux); err != nil {
-			log.Printf("WebSocket server error: %v", err)
-		}
-	}()
-
-	return nil
+func (s *wsSink) Send(data []byte) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	_ = s.conn.SetWriteDeadline(time.Now().Add(5 * time.Second))
+	return s.conn.WriteMessage(websocket.BinaryMessage, data)
 }
 
-func (s *WebSocketServer) handleWS(w http.ResponseWriter, r *http.Request) {
-	token := r.URL.Query().Get("token")
-	if token != s.Token {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+func (s *wsSink) Close() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	_ = s.conn.WriteControl(websocket.CloseMessage,
+		websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""),
+		time.Now().Add(time.Second))
+	s.conn.Close()
+}
+
+// ServeWS attaches a WebSocket client to the terminal (development server).
+func (t *TTY) ServeWS(w http.ResponseWriter, r *http.Request) {
+	if t.closed.Load() {
+		http.Error(w, "tty closed", http.StatusGone)
 		return
 	}
-
-	id := strings.TrimPrefix(r.URL.Path, "/ws/")
-	if id == "" {
-		http.Error(w, "Missing session ID", http.StatusBadRequest)
-		return
-	}
-
-	session, err := s.manager.GetSession(id)
-	if err != nil {
-		http.Error(w, "Session not found", http.StatusNotFound)
-		return
-	}
-
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("Failed to upgrade connection: %v", err)
 		return
 	}
-	defer conn.Close()
-
-	// Read from PTY -> Send to WS
-	go func() {
-		buf := make([]byte, 1024)
-		for {
-			n, err := session.Read(buf)
-			if err != nil {
-				if err != io.EOF {
-					log.Printf("Error reading from PTY: %v", err)
-				}
-				return
-			}
-			if err := conn.WriteMessage(websocket.BinaryMessage, buf[:n]); err != nil {
-				return
-			}
-		}
-	}()
-
-	// Read from WS -> Send to PTY
+	sink := &wsSink{conn: conn}
+	t.Attach(sink)
 	for {
-		msgType, p, err := conn.ReadMessage()
-		if err != nil {
-			return
+		_, msg, err := conn.ReadMessage()
+		if err != nil || t.Write(msg) != nil {
+			break
 		}
-		if msgType == websocket.BinaryMessage || msgType == websocket.TextMessage {
-			session.Write(p)
-		}
+	}
+	if t.Detach(sink) && !t.main {
+		t.Close()
 	}
 }

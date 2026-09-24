@@ -1,111 +1,156 @@
-# 🌌 eDEX-UI-Go
+<p align="center">
+  <img alt="eDEX-UI" src="docs/logo.png" width="320" />
+</p>
 
-<div align="center">
-<pre>
-       _____  ________   __     _    _ _____       _____  ____  
-      |  __ \|  ____\ \ / /    | |  | |_   _|     / ____|/ __ \ 
-   ___| |  | | |__   \ V /_____| |  | | | |______| |  __| |  | |
-  / _ \ |  | |  __|   > <______| |  | | | |______| | |_ | |  | |
- |  __/ |__| | |____ / . \     | |__| |_| |_     | |__| | |__| |
-  \___|_____/|______/_/ \_\     \____/|_____|     \_____|\____/ 
-  
-</pre>
-</div>
+<h1 align="center">eDEX-UI-GO</h1>
+
+> **eDEX-UI-GO is a port of [eDEX-UI](https://github.com/GitSquared/edex-ui), created by
+> [Gabriel "Squared" SAILLARD](https://github.com/GitSquared).**
+> The interface, the themes, the keyboard layouts, the sounds, the fonts and most of the UI
+> code are his work (and of the eDEX-UI contributors), released under the GPLv3.
+> eDEX-UI was archived in October 2021; this project keeps its philosophy alive by replacing
+> Electron and Node.js with a Go backend running on [Wails](https://wails.io).
+> All credit for the design goes to the original project. Go star it. ⭐
+
+---
 
 <p align="center">
-  <img alt="Go Version" src="https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white" />
-  <img alt="Wails" src="https://img.shields.io/badge/Wails-v2-red?logo=wails&logoColor=white" />
-  <img alt="Svelte 5" src="https://img.shields.io/badge/Svelte-5-FF3E00?logo=svelte&logoColor=white" />
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.0-3178C6?logo=typescript&logoColor=white" />
+  <img alt="Go" src="https://img.shields.io/badge/Go-1.25+-00ADD8?logo=go&logoColor=white" />
+  <img alt="Wails" src="https://img.shields.io/badge/Wails-v2-red" />
   <img alt="License" src="https://img.shields.io/badge/License-GPLv3-blue.svg" />
 </p>
 
-A cross-platform, customizable science fiction terminal emulator with advanced monitoring & touchscreen support. Re-engineered in **Go** and **Wails v2** for extreme performance.
+eDEX-UI-GO is a fullscreen, cross-platform terminal emulator and system monitor that looks and
+feels like a sci-fi computer interface, heavily inspired by the
+[TRON Legacy movie effects](https://web.archive.org/web/20170511000410/http://jtnimoy.com/blogs/projects/14881671).
+It runs your shell in a real pseudo-terminal and surrounds it with live system information,
+a file browser that follows your working directory, a network globe and an on-screen keyboard.
 
-## 🚀 Key Features
+## Goals
 
-- **Sci-Fi Interface**: Inspired by TRON: Legacy and other sci-fi movies.
-- **Blazing Fast Terminal**: Built with xterm.js and a highly optimized Go backend.
-- **Real-time System Monitoring**: CPU, RAM, Network, and Disk IO visualizations.
-- **File Browser**: Integrated directory navigation and file preview.
-- **Customizable Themes**: Full support for original eDEX-UI themes.
-- **On-screen Keyboard**: Built-in virtual keyboard for touchscreen devices.
-- **Multi-Tab Support**: Run multiple terminal sessions seamlessly.
-- **Boot Sequence**: Authentic retro-futuristic boot animation.
+- **Fidelity.** Same look, same boot sequence, same modules, same sounds, same shortcuts and the
+  same `settings.json`, themes and keyboard layout formats as eDEX-UI 2.2.8. The original UI code
+  is ported almost line by line; each modified file says what changed.
+- **No Electron.** A small Go binary and the operating system's webview instead of a bundled
+  Chromium and Node.js with native modules to rebuild.
+- **Secure by design.** The original ran the shell behind an unauthenticated local WebSocket
+  server that any website could connect to. eDEX-UI-GO does not open any network port: the UI
+  talks to the backend through the Wails IPC only. See [Security](#security).
+- **Linux first, but everywhere.** Linux is the primary target; Windows (ConPTY) and macOS are
+  supported by the same code.
 
-## 📸 Screenshots
+## Features
 
-*(Screenshots coming soon)*
+Everything the original had:
 
-## ⚡ Performance Comparison (vs Electron)
+- Boot log and animated title screen (skippable with `nointro`)
+- Main shell with up to 4 extra tabs, xterm.js with the WebGL renderer
+- System panel: clock, date/uptime/OS/power, hardware, CPU usage/temperature/frequency,
+  memory map and swap, top processes (click for the full process list)
+- Network panel: interface state, public IP and ping, world globe (GeoIP), traffic graphs
+- File browser following the terminal's working directory, disk list, text editor, image,
+  audio, video and PDF viewers, fuzzy finder
+- On-screen keyboard with 19 layouts, touch support and password mode
+- Themes (21 bundled), settings editor, keyboard shortcuts editor, sound effects
 
-| Metric | eDEX-UI (Electron) | eDEX-UI-Go (Wails) | Improvement |
-| :--- | :--- | :--- | :--- |
-| **RAM Usage** | ~400-600 MB | ~50-80 MB | 🚀 85% less |
-| **CPU Idle** | ~2-5% | ~0.1% | 🚀 95% less |
-| **Binary Size** | ~150 MB | ~15 MB | 🚀 90% smaller |
-| **Startup Time** | ~3.5s | ~0.5s | 🚀 7x faster |
+Plus: a shortcut (**Ctrl+Shift+Alt+K**) and a `hideKeyboard` setting to hide the on-screen keyboard
+and give its space to the file browser.
 
-## 🛠️ Tech Stack
+## Installing
 
-- **Backend**: Go 1.22+, Wails v2, pty
-- **Frontend**: Svelte 5, TypeScript, xterm.js, Chart.js, Tailwind CSS
+Pre-built binaries will be published on the Releases page.
 
-## ⚙️ Prerequisites and Installation
+### Building from source
 
-### Download Release
-Pre-compiled binaries for Windows, macOS, and Linux are available on the [Releases](#) page.
+Requirements: [Go](https://go.dev/dl/) 1.25+, [Node.js](https://nodejs.org/) 20+ and the
+[Wails CLI](https://wails.io/docs/gettingstarted/installation) v2:
 
-### Build from Source
-Ensure you have [Go](https://go.dev/) (1.22+) and [Wails](https://wails.io/docs/gettingstarted/installation) installed.
+```bash
+go install github.com/wailsapp/wails/v2/cmd/wails@latest
+```
+
+On Linux, the WebKitGTK development files are also needed, for example on Debian/Ubuntu:
+
+```bash
+sudo apt install build-essential pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev
+```
+
+Then:
 
 ```bash
 git clone https://github.com/dcasula/edex-ui-go.git
 cd edex-ui-go
-wails build
+make deps
+make build        # binary in build/bin/
 ```
 
-The executable will be located in the `build/bin` directory.
-
-## 🕹️ Usage
-
-Simply run the executable:
-```bash
-./build/bin/edex-ui-go
-```
-
-## 🔧 Configuration
-
-Settings are stored in `settings.json` located in your user config directory:
-- **Windows**: `%APPDATA%\edex-ui-go\settings.json`
-- **macOS**: `~/Library/Application Support/edex-ui-go/settings.json`
-- **Linux**: `~/.config/edex-ui-go/settings.json`
-
-Key options include changing the shell, terminal colors, enabling/disabling the keyboard, and adjusting font size.
-
-## 🎨 Themes
-
-eDEX-UI-Go supports a robust theming system. You can create your own themes or port existing ones from the original eDEX-UI.
-Check out the [Themes Guide](docs/THEMES.md) for more details.
-
-## 👨‍💻 Development
-
-To start the app in live development mode:
+## Usage
 
 ```bash
-wails dev
+./build/bin/edex-ui-go             # or edex-ui-go --nointro / --nocursor
 ```
-See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for a deep dive into the project structure.
 
-## 🤝 Contributing
+The configuration lives in the user data directory, like the original:
 
-We welcome contributions! Please read our [Contributing Guide](docs/CONTRIBUTING.md) before submitting pull requests.
+| OS      | Location                                       |
+| ------- | ---------------------------------------------- |
+| Linux   | `~/.config/eDEX-UI-GO/`                        |
+| macOS   | `~/Library/Application Support/eDEX-UI-GO/`    |
+| Windows | `%APPDATA%\eDEX-UI-GO\`                        |
 
-## 📜 Credits
+It contains `settings.json`, `shortcuts.json`, and the `themes`, `keyboards` and `fonts` folders.
+The file formats are the ones of eDEX-UI, so existing themes and layouts can be dropped in.
+The settings editor opens with **Ctrl+Shift+S**, the list of shortcuts with **Ctrl+Shift+K**.
+See [docs/THEMES.md](docs/THEMES.md) to write a theme.
 
-- Original [eDEX-UI](https://github.com/GitSquared/edex-ui) created by [GitSquared](https://github.com/GitSquared).
-- UI inspiration from TRON: Legacy (Disney).
+## Development
 
-## ⚖️ License
+```bash
+make dev          # desktop app with live reload (wails dev)
+make serve        # backend + UI in your browser, no Wails/WebKit needed
+make test
+```
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+`make serve` runs `cmd/edex-serve`, a development-only server that prints a URL containing a
+random token. It is handy to work on the UI with browser dev tools and to run automated UI tests.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
+
+## Security
+
+In eDEX-UI, each terminal was served by a WebSocket server listening on `127.0.0.1:3000` and
+following ports, without any authentication. Browsers do not apply the same-origin policy to
+WebSockets, so any web page could connect to it and type commands in your shell.
+
+eDEX-UI-GO does not listen on any port. Terminal input and output, system information and file
+access all go through the Wails IPC, which is only reachable from the application window.
+The optional development server (`edex-serve`) binds to loopback only, requires a random
+192-bit token on every request and rejects requests coming from other origins.
+
+Please report vulnerabilities privately through GitHub security advisories.
+
+## Credits
+
+- **[eDEX-UI](https://github.com/GitSquared/edex-ui)** by **Gabriel "Squared" SAILLARD**
+  ([gaby.dev](https://gaby.dev)) and its contributors: design, UI code, themes, keyboard layouts
+  and assets. [PixelyIon](https://github.com/PixelyIon) helped with its Windows support.
+- Sound effects by [IceWolf](https://soundcloud.com/iamicewolf), from eDEX-UI.
+- [Encom Globe](https://github.com/arscan/encom-globe) by Rob "arscan" Scanlon (network globe).
+- [xterm.js](https://xtermjs.org), [augmented-ui](https://augmented-ui.com),
+  [smoothie charts](http://smoothiecharts.org), [howler.js](https://howlerjs.com),
+  [pdf.js](https://mozilla.github.io/pdf.js/), [file-icons](https://github.com/file-icons/atom).
+- Go: [Wails](https://wails.io), [gopsutil](https://github.com/shirou/gopsutil),
+  [creack/pty](https://github.com/creack/pty), [conpty](https://github.com/UserExistsError/conpty),
+  [gorilla/websocket](https://github.com/gorilla/websocket), [fsnotify](https://github.com/fsnotify/fsnotify),
+  [geoip2-golang](https://github.com/oschwald/geoip2-golang), [battery](https://github.com/distatus/battery).
+- GeoLite2 data by [MaxMind](https://www.maxmind.com).
+- Inspired by the TRON Legacy movie effects (the
+  [Board Room sequence](https://gmunk.com/TRON-Board-Room)) and by
+  [DEX-UI](https://github.com/seenaburns/dex-ui) by [Seena](https://github.com/seenaburns),
+  like the original.
+
+## License
+
+[GNU General Public License v3.0](LICENSE), the license of eDEX-UI.
+
+Copyright © 2017-2021 Gabriel "Squared" SAILLARD (eDEX-UI) and the eDEX-UI contributors.
+Copyright © 2026 the eDEX-UI-GO contributors.
