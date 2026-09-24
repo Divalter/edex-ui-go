@@ -12,7 +12,7 @@
   },
   "info": {
     "productName": "eDEX-UI-GO",
-    "productVersion": "0.1.0",
+    "productVersion": "0.0.1",
     "copyright": "Copyright © 2017-2021 Gabriel 'Squared' SAILLARD (eDEX-UI), 2026 eDEX-UI-GO contributors. GPLv3.",
     "comments": "A science fiction terminal emulator. Go + Wails port of eDEX-UI by Gabriel 'Squared' SAILLARD."
   }

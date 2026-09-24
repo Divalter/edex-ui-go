@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - Unreleased
+## [0.0.1] - 2026-09-24
 
 First port of [eDEX-UI](https://github.com/GitSquared/edex-ui) 2.2.8 by Gabriel "Squared" SAILLARD
 to Go and Wails.
@@ -36,3 +36,11 @@ to Go and Wails.
 
 ### Fixed
 - The UI hung at startup with `nointro` on WebKit (fonts wait).
+
+### Notes
+- First public preview. Linux is the primary target; the Windows and macOS builds are
+  experimental and have not been tested on real machines yet.
+- Linux: requires WebKitGTK 4.1 (`libwebkit2gtk-4.1-0`, installed by default on Debian 13,
+  Ubuntu 24.04 and Fedora 40+). Extract the archive and run `./edex-ui-go`.
+- The binaries are not signed. On macOS, run `xattr -dr com.apple.quarantine eDEX-UI-GO.app`
+  after extracting; on Windows, SmartScreen may ask for confirmation.
