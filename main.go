@@ -15,7 +15,9 @@ import (
 	"os"
 	"slices"
 	"strings"
+	"sync"
 	"sync/atomic"
+	"time"
 
 	"edex-ui-go/internal/app"
 	"edex-ui-go/internal/bridge"
@@ -36,6 +38,9 @@ type Host struct {
 	ctx      atomic.Pointer[context.Context]
 	backend  *app.App
 	startErr error
+
+	fullscreen     bool
+	fullscreenOnce sync.Once
 }
 
 // Call runs a backend RPC method (see internal/app/handlers.go).
@@ -86,6 +91,25 @@ func (h *Host) startup(ctx context.Context) {
 	}
 }
 
+// domReady enters fullscreen once the window is mapped. The start state
+// alone is not reliable on Linux: GTK can fail to read the monitor geometry
+// before the window is shown, and Wails then silently skips fullscreen.
+// Only the first load counts: later reloads (theme switch) must keep the
+// state chosen with F11.
+func (h *Host) domReady(ctx context.Context) {
+	if !h.fullscreen {
+		return
+	}
+	h.fullscreenOnce.Do(func() {
+		go func() {
+			for i := 0; i < 10 && !runtime.WindowIsFullscreen(ctx); i++ {
+				runtime.WindowFullscreen(ctx)
+				time.Sleep(200 * time.Millisecond)
+			}
+		}()
+	})
+}
+
 func (h *Host) shutdown(context.Context) {
 	if h.backend != nil {
 		h.backend.Shutdown()
@@ -117,6 +141,10 @@ func main() {
 	}
 
 	host := &Host{}
+	if generatingBindings {
+		_ = wails.Run(&options.App{Bind: []interface{}{host}})
+		return
+	}
 	host.backend, host.startErr = app.New(app.Options{
 		Version:  buildinfo.Version,
 		Runtime:  buildinfo.Runtime(true),
@@ -144,13 +172,15 @@ func main() {
 	if fullscreen {
 		startState = options.Fullscreen
 	}
+	host.fullscreen = fullscreen
 
 	err = wails.Run(&options.App{
-		Title:            app.Name,
-		Width:            1280,
-		Height:           720,
+		Title:  app.Name,
+		Width:  1280,
+		Height: 720,
+		// The window stays resizable: window managers such as Mutter refuse
+		// to put a non-resizable window in fullscreen.
 		Frameless:        !allowWindowed,
-		DisableResize:    !allowWindowed,
 		WindowStartState: startState,
 		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 255},
 		AssetServer: &assetserver.Options{
@@ -158,6 +188,7 @@ func main() {
 			Handler: http.HandlerFunc(host.serveAsset),
 		},
 		OnStartup:  host.startup,
+		OnDomReady: host.domReady,
 		OnShutdown: host.shutdown,
 		Bind:       []interface{}{host},
 		SingleInstanceLock: &options.SingleInstanceLock{
