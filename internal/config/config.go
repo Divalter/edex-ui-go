@@ -94,7 +94,7 @@ func newDefaultSettings(cwd string) defaultSettings {
 	return defaultSettings{
 		Shell:                     shell,
 		Cwd:                       cwd,
-		Keyboard:                  "en-US",
+		Keyboard:                  DetectKeyboard(),
 		Theme:                     "tron",
 		TermFontSize:              15,
 		Audio:                     true,

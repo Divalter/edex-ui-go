@@ -10,6 +10,9 @@
  *  - Uses xterm.js 6 (@xterm/*); the ligatures addon is not available in a webview.
  *  - The data stream comes from window.edexHost.openTTY (Wails IPC or dev WebSocket).
  *  - Clipboard access goes through the Wails runtime.
+ *  - The input textarea uses inputmode="none" instead of readonly (see #733),
+ *    which broke dead keys and non-ASCII characters, and is emptied after
+ *    each input (composed characters were sent again on WebKitGTK).
  *  - Converted from a CommonJS script to an ES module.
  */
 class Terminal {
@@ -164,7 +167,26 @@ class Terminal {
                 return true;
             });
             // Prevent soft-keyboard on touch devices #733
-            document.querySelectorAll('.xterm-helper-textarea').forEach(textarea => textarea.setAttribute('readonly', 'readonly'))
+            // inputmode="none" instead of the original readonly attribute: readonly
+            // also disables the input method, which drops accented characters and
+            // dead keys (ABNT2, AZERTY...) on WebKitGTK.
+            document.querySelectorAll('.xterm-helper-textarea').forEach(textarea => textarea.setAttribute('inputmode', 'none'))
+
+            // WebKitGTK keeps the committed text in xterm's input textarea, and
+            // xterm then sends the whole accumulated text again with every
+            // composed character (á, ã, ê...). Empty it once the data was sent,
+            // unless a composition is in progress.
+            let helper = document.getElementById(opts.parentId).querySelector(".xterm-helper-textarea");
+            if (helper) {
+                let composing = false;
+                helper.addEventListener("compositionstart", () => { composing = true; });
+                helper.addEventListener("compositionend", () => { composing = false; });
+                this.term.onData(() => {
+                    setTimeout(() => {
+                        if (!composing) helper.value = "";
+                    }, 0);
+                });
+            }
             this.term.focus();
 
             this.Ipc.send("terminal_channel-"+this.port, "Renderer startup");

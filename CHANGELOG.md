@@ -12,7 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   faster (5.9 ms instead of 90 ms for ~500 processes) with 29 times fewer allocations.
 - The backend logs when a terminal connects to the UI, like the original.
 
+### Fixed
+- Physical keyboards: accented characters, dead keys and other non-ASCII input (ABNT2 `´ ~ ^ ` ¨`,
+  `ç`, AZERTY…) were dropped on WebKitGTK. The terminal input no longer uses the original
+  `readonly` trick (`inputmode="none"` keeps touch keyboards away), and composed text is no
+  longer sent twice.
+- On-screen `pt-BR` layout: it now matches ABNT2 (dead keys for `´ ` ~ ^ ¨`, `, . ; / [ ]` were
+  swapped with their Shift variant, AltGr layer `¹²³£¢¬§ / ? ° ª º ₢`).
+
 ### Added
+- New installs pick the on-screen keyboard layout matching the system keyboard (GNOME,
+  `/etc/default/keyboard`).
 - `docs/PERFORMANCE.md` and `scripts/perf/measure.py`: startup, memory and CPU compared with
   eDEX-UI 2.2.8.
 

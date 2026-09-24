@@ -81,3 +81,21 @@ func TestShellArgsAndEnv(t *testing.T) {
 		t.Error("string env must be ignored")
 	}
 }
+
+func TestKeyboardFor(t *testing.T) {
+	cases := map[[2]string]string{
+		{"br", ""}: "pt-BR", {"us", "dvorak"}: "en-DVORAK", {"us", "intl"}: "en-US",
+		{"fr", "bepo"}: "fr-BEPO", {"tr", "f"}: "tr-TR-F", {"latam", ""}: "es-LAT",
+	}
+	for in, want := range cases {
+		if got, ok := keyboardFor(in[0], in[1]); !ok || got != want {
+			t.Errorf("keyboardFor(%q, %q) = %q", in[0], in[1], got)
+		}
+	}
+	if _, ok := keyboardFor("xx", ""); ok {
+		t.Error("unknown layout should not match")
+	}
+	if m := gnomeSource.FindStringSubmatch(`[('xkb', 'us+dvorak'), ('xkb', 'br')]`); m == nil || m[1] != "us" || m[2] != "dvorak" {
+		t.Errorf("gsettings parsing: %v", m)
+	}
+}
