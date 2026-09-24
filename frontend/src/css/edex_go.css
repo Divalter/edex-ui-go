@@ -56,3 +56,86 @@ div#main_shell_innercontainer {
 html.dropdown_show body {
     animation: edex_dropdown 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
+/*
+ * Themed <select> pickers (see host/select.js). WebKitGTK opens a native GTK
+ * menu for <select>, which ignores the theme colors Electron applied.
+ */
+select.edex_select_native {
+    display: none !important;
+}
+div.modal_popup td button.edex_select {
+    cursor: pointer;
+    width: 100%;
+    margin: 0;
+    background: var(--color_light_black);
+    color: rgb(var(--color_r), var(--color_g), var(--color_b));
+    border: 0.15vh solid rgb(var(--color_r), var(--color_g), var(--color_b));
+    border-radius: 0;
+    padding: 0.4vh;
+    padding-right: 2.4vh;
+    font-family: inherit;
+    font-size: 1.4vh;
+    text-align: left;
+    position: relative;
+    outline: none;
+}
+div.modal_popup td button.edex_select::after {
+    content: "";
+    position: absolute;
+    right: 0.8vh;
+    top: 50%;
+    border-left: 0.5vh solid transparent;
+    border-right: 0.5vh solid transparent;
+    border-top: 0.6vh solid rgb(var(--color_r), var(--color_g), var(--color_b));
+    transform: translateY(-50%);
+}
+div.modal_popup td button.edex_select.open::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+div.modal_popup td button.edex_select:focus,
+div.modal_popup td button.edex_select.open {
+    background: rgb(var(--color_r), var(--color_g), var(--color_b));
+    color: var(--color_light_black);
+}
+div.modal_popup td button.edex_select:focus::after,
+div.modal_popup td button.edex_select.open::after {
+    border-top-color: var(--color_light_black);
+}
+ul.edex_select_list {
+    position: fixed;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: auto;
+    box-sizing: border-box;
+    background: var(--color_light_black);
+    border: 0.15vh solid rgb(var(--color_r), var(--color_g), var(--color_b));
+    border-top: none;
+    color: rgb(var(--color_r), var(--color_g), var(--color_b));
+    font-family: var(--font_main), sans-serif;
+    font-size: 1.4vh;
+    cursor: pointer;
+}
+ul.edex_select_list > li {
+    padding: 0.4vh;
+    white-space: nowrap;
+}
+ul.edex_select_list > li.selected {
+    font-weight: bold;
+}
+ul.edex_select_list > li.active {
+    background: rgb(var(--color_r), var(--color_g), var(--color_b));
+    color: var(--color_light_black);
+}
+
+/*
+ * WebKitGTK always draws GTK spin buttons on number inputs (Chromium only
+ * showed them on hover), grey whatever the theme. The arrow keys and the
+ * mouse wheel still change the value.
+ */
+div.modal_popup td input[type="number"]::-webkit-inner-spin-button,
+div.modal_popup td input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

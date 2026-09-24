@@ -38,6 +38,7 @@ import "./css/edex_go.css";
 import {call, connect, fileURL, ipcRenderer, isWails, openTTY} from "./host/bridge.js";
 import {createNodeShims} from "./host/node.js";
 import {initDropdown} from "./host/dropdown.js";
+import {initSelects} from "./host/select.js";
 
 import {Modal} from "./classes/modal.class.js";
 import {Terminal} from "./classes/terminal.class.js";
@@ -78,6 +79,7 @@ async function start() {
         RAMwatcher, Toplist, FuzzyFinder, AudioManager
     });
 
+    initSelects();
     await import("./renderer.js");
     initDropdown();
 }

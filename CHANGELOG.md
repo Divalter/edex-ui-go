@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The backend logs when a terminal connects to the UI, like the original.
 
 ### Fixed
+- `<select>` pickers (settings editor) follow the theme again: WebKitGTK opened a native GTK menu
+  that ignored the theme colors, so they are now drawn in HTML over the original `<select>`
+  (mouse and keyboard: arrows, Enter, Esc). The grey GTK spin buttons of number fields are hidden.
 - Physical keyboards: accented characters, dead keys and other non-ASCII input (ABNT2 `´ ~ ^ ` ¨`,
   `ç`, AZERTY…) were dropped on WebKitGTK. The terminal input no longer uses the original
   `readonly` trick (`inputmode="none"` keeps touch keyboards away), and composed text is no
